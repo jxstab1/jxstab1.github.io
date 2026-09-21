@@ -2,7 +2,6 @@
   const contact1 = "@hxxhaa";
   const allowedHost = "jxstab1.github.io";
   const allowedPath = "OJ!DBWjb1BNsbi!9237.html";
-  
   if (window.location.hostname !== allowedHost && window.location.pathname.indexOf(allowedPath) === -1) {
     console.warn("THEFT DETECTED. REPORT TO " + contact1);
     document.documentElement.innerHTML = "<div style=\"background:#000;color:red;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:monospace;text-align:center;padding:20px;\"><h1 style=\"font-size:50px;\">🚨 COPY DETECTED 🚨</h1><h2>ЭТОТ САЙТ БЫЛ УКРАДЕН У JXTEC</h2><p>Скрипт защиты обнаружил запуск на чужом домене или с неверным именем файла.</p><h3>Оригинал и поддержка: <br><a href=\"https://t.me/jxtec\" style=\"color:#0f0;font-size:30px;text-decoration:none;\">@jxtec</a></h3><h4>Add your phone here: <a href=\"https://t.me/hxxhaa\" style=\"color:#0f0;\">@hxxhaa</a></h4></div>";
@@ -101,8 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
     SamsungS4Zoom: { image: "phones/SamsungS4Zoom.png", stabilizationPoint: { x: "50.14%", y: "30.74%" }, specs: { processor: "Dual-Core 1.5GHz", camera: "16MP 10x Zoom" } },
     XiaomiMixAlpha: { image: "phones/XiaomiMixAlpha.png", stabilizationPoint: { x: "38.38%", y: "12.03%" }, specs: { processor: "Snapdragon 855+", camera: "108MP Surround" } },
     XiaomiMixFlip: { image: "phones/XiaomiMixFlip.png", stabilizationPoint: { x: "41.80%", y: "22.10%" }, specs: { processor: "Snapdragon 8 Gen 3", camera: "Leica Flip" } },
-    
-    // ----- ОБНОВЛЕННЫЕ КООРДИНАТЫ -----
     "Samsung-S20_Ultra": { image: "phones/Samsung-S20_Ultra.png", stabilizationPoint: { x: "21.10%", y: "17.85%" }, specs: { processor: "Exynos 990", camera: "108MP" } },
     "Honor-robot": { image: "phones/Honor-robot.png", stabilizationPoint: { x: "47.67%", y: "9.40%" }, specs: { processor: "Unknown", camera: "Unknown" } },
     "Iphone15": { image: "phones/Iphone15.png", stabilizationPoint: { x: "47.85%", y: "20.12%" }, specs: { processor: "A16 Bionic", camera: "48MP Main" } }
@@ -110,30 +107,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const textLocales = {
     ru: {
-      version_text: "Версия XV", controls_title: "Управление", phone_model_label: "Устройство:", info_button_text: "Инфо",
+      controls_title: "Панель Управления", phone_model_label: "Устройство", info_button_text: "Инфо",
       settings_button_text: "Настройки", support_button_text: "Добавить ваш телефон", language_modal_title: "Язык",
       settings_title: "Настройки", settings_white_fire: "Rage Glow (Огонь)", settings_shadows: "3D Тени",
-      settings_stabilization: "Стабилизация OIS", settings_super_fps: "FPS Boost (Lite Mode)", close_button: "Закрыть",
-      info_title: "О Проекте", info_development_title: "Команда:", loader_welcome: "StabFX Ultimate",
-      loader_support: "Симулятор стабилизации", loader_reactions: "100 Реакций - Обнова", loader_enter: "Запустить",
-      donation_text: "Поддержать разработку", settings_light_theme: "Светлая тема", music_toggle_text: "Музыка",
-      processor_title: "Процессор", camera_title: "Камера", turbo_title: "Turbo Propeller", launch_btn: "ЗАПУСТИТЬ",
-      fx_title: "FX Studio", settings_stretch: "Растяжение (Ширина)", settings_fps: "Ограничение FPS",
-      photo_mode_title: "Фото Режим", photo_mode_desc: "Создать красивый скриншот", photo_nick_label: "Твой Никнейм",
-      photo_generate: "Создать Вид", photo_exit: "Выйти"
+      settings_stabilization: "Стабилизация (OIS)", settings_super_fps: "FPS Boost (Lite Mode)", close_button: "Закрыть",
+      info_title: "О Проекте", info_development_title: "Разработка", loader_welcome: "STABFX ULTIMATE",
+      loader_support: "Симулятор стабилизации кинематографического уровня", loader_reactions: "100 Реакций — Обнова",
+      loader_enter: "Войти в приложение", donation_text: "Поддержать разработку", settings_light_theme: "Светлая тема",
+      music_toggle_text: "Музыка", processor_title: "Процессор", camera_title: "Камера", turbo_title: "Turbo Propeller",
+      launch_btn: "ЗАПУСТИТЬ", fx_title: "FX Studio", settings_stretch: "Растяжение (Ширина)",
+      settings_fps: "FPS (Производительность)", photo_mode_title: "Фото Режим",
+      photo_mode_desc: "Создать красивый скриншот", photo_nick_label: "Твой Никнейм", photo_generate: "Создать Вид",
+      add_phone_button: "Добавить свой телефон", add_phone_title: "Добавить свой телефон", add_phone_name: "Название модели",
+      add_phone_image: "Изображение телефона", add_phone_upload: "Нажмите, чтобы выбрать PNG",
+      add_phone_cpu: "Процессор", add_phone_cam: "Камера", add_phone_save: "Сохранить телефон",
+      add_phone_error: "Введите название и выберите изображение", custom_list_title: "Мои устройства",
+      add_phone_saved_text: "Телефон добавлен! Для точной настройки точки стабилизации введите camera() в консоли (F12) и кликните по камере на картинке."
     },
     en: {
-      version_text: "Version XV", controls_title: "Controls", phone_model_label: "Device:", info_button_text: "Info",
+      controls_title: "Controls", phone_model_label: "Device", info_button_text: "Info",
       settings_button_text: "Settings", support_button_text: "Add your phone", language_modal_title: "Language",
       settings_title: "Settings", settings_white_fire: "Rage Glow", settings_shadows: "3D Shadows",
       settings_stabilization: "OIS Stabilization", settings_super_fps: "FPS Boost (Lite Mode)", close_button: "Close",
-      info_title: "About", info_development_title: "Team:", loader_welcome: "StabFX Ultimate",
-      loader_support: "Cinema Stabilization Sim", loader_reactions: "100 Reactions - Update", loader_enter: "Start App",
-      donation_text: "Donate", settings_light_theme: "Light Mode", music_toggle_text: "Music", processor_title: "Processor",
-      camera_title: "Camera", turbo_title: "Turbo Propeller", launch_btn: "LAUNCH", fx_title: "FX Studio",
-      settings_stretch: "Stretch (Width)", settings_fps: "Target FPS", photo_mode_title: "Photo Mode",
-      photo_mode_desc: "Create beautiful screenshot", photo_nick_label: "Your Nickname", photo_generate: "Generate View",
-      photo_exit: "Exit"
+      info_title: "About", info_development_title: "Team", loader_welcome: "STABFX ULTIMATE",
+      loader_support: "Cinema-grade stabilization simulator", loader_reactions: "100 Reactions — Update",
+      loader_enter: "Enter Application", donation_text: "Support development", settings_light_theme: "Light Theme",
+      music_toggle_text: "Music", processor_title: "Processor", camera_title: "Camera", turbo_title: "Turbo Propeller",
+      launch_btn: "LAUNCH", fx_title: "FX Studio", settings_stretch: "Stretch (Width)",
+      settings_fps: "FPS (Performance)", photo_mode_title: "Photo Mode",
+      photo_mode_desc: "Create a beautiful screenshot", photo_nick_label: "Your Nickname", photo_generate: "Generate View",
+      add_phone_button: "Add Your Phone", add_phone_title: "Add Your Phone", add_phone_name: "Model Name",
+      add_phone_image: "Phone Image", add_phone_upload: "Tap to choose a PNG",
+      add_phone_cpu: "Processor", add_phone_cam: "Camera", add_phone_save: "Save Phone",
+      add_phone_error: "Enter a name and select an image", custom_list_title: "My Devices",
+      add_phone_saved_text: "Phone added! For precise stabilization point calibration type camera() in the console (F12) and click the camera on the image."
     }
   };
 
@@ -158,6 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let stretchScale = 1;
   let currentFpsLimit = 60;
   let lastFrameTime = 0;
+  let customPhones = {};
 
   const loaderScreen = document.getElementById("loader-overlay");
   const enterBtn = document.getElementById("enter-site-btn");
@@ -172,6 +180,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const languageModal = document.getElementById("language-modal");
   const musicModal = document.getElementById("music-modal");
   const photoModal = document.getElementById("photo-modal");
+  const addPhoneModal = document.getElementById("add-phone-modal");
+  const addPhoneBtn = document.getElementById("add-phone-btn");
+  const saveCustomBtn = document.getElementById("save-custom-phone");
+  const customNameInput = document.getElementById("custom-phone-name");
+  const customCpuInput = document.getElementById("custom-phone-cpu");
+  const customCamInput = document.getElementById("custom-phone-cam");
+  const customFileInput = document.getElementById("custom-phone-image");
+  const customList = document.getElementById("custom-phones-list");
+  const fileDropText = document.getElementById("file-drop-text");
   const settingsBtn = document.getElementById("settings-btn");
   const infoBtn = document.getElementById("info-btn");
   const fxPanelBtn = document.getElementById("fx-panel-btn");
@@ -211,28 +228,141 @@ document.addEventListener("DOMContentLoaded", () => {
   const pcCam = document.getElementById("pc-cam");
   const photoExitBtn = document.getElementById("photo-exit-btn");
 
-  // Встроенный Дебаг-Режим для координат
+  function getLocaleText(key) {
+    const lang = document.documentElement.lang || "ru";
+    return (textLocales[lang] && textLocales[lang][key]) || textLocales.ru[key] || "";
+  }
+
   function setupDebug() {
     window.camera = function () {
       isDebugMode = true;
       wrapperBg.style.cursor = "crosshair";
-      
-      // Сбрасываем вращение, чтобы координаты клика были идеально точными
       autoSpinMode = false;
       targetRotation = 0;
       currentRotation = 0;
       if (phoneImg) phoneImg.style.transform = `perspective(1000px) rotateZ(0deg) scaleX(${stretchScale})`;
-      
-      console.log("%c[DEBUG] Режим калибровки ВКЛ. Кликни по камере на телефоне.", "color: lime; font-weight: bold; font-size: 14px;");
+      console.log("%c[DEBUG] Calibration mode ON. Click the camera on the phone.", "color: lime; font-weight: bold; font-size: 14px;");
     };
-
     window.off = function () {
       isDebugMode = false;
       wrapperBg.style.cursor = "default";
-      console.log("%c[DEBUG] Режим калибровки ВЫКЛ.", "color: red; font-weight: bold; font-size: 14px;");
+      console.log("%c[DEBUG] Calibration mode OFF.", "color: red; font-weight: bold; font-size: 14px;");
     };
+    console.log("%c[DEBUG] Type camera() to start calibration, off() to disable.", "color: cyan; font-weight: bold;");
+  }
 
-    console.log('%c[DEBUG] Утилиты отладки загружены. Введите camera() для начала, off() для выключения.', 'color: cyan; font-weight: bold;');
+  function loadCustomPhones() {
+    customPhones = {};
+    try {
+      const stored = JSON.parse(localStorage.getItem("jxCustomPhones"));
+      if (stored && typeof stored === "object") {
+        Object.keys(stored).forEach(key => {
+          if (stored[key] && stored[key].image) {
+            customPhones[key] = stored[key];
+            phonesData[key] = stored[key];
+          }
+        });
+      }
+    } catch (err) {
+      customPhones = {};
+    }
+  }
+
+  function persistCustomPhones() {
+    try {
+      localStorage.setItem("jxCustomPhones", JSON.stringify(customPhones));
+      return true;
+    } catch (err) {
+      alert("Storage is full. Delete some custom phones.");
+      return false;
+    }
+  }
+
+  function renderCustomPhonesList() {
+    if (!customList) return;
+    customList.innerHTML = "";
+    const keys = Object.keys(customPhones);
+    if (!keys.length) return;
+    const title = document.createElement("p");
+    title.className = "custom-list-title";
+    title.textContent = getLocaleText("custom_list_title");
+    customList.appendChild(title);
+    keys.forEach(name => {
+      const row = document.createElement("div");
+      row.className = "custom-phone-row";
+      const thumb = document.createElement("img");
+      thumb.src = customPhones[name].image;
+      thumb.draggable = false;
+      const label = document.createElement("span");
+      label.textContent = name;
+      const del = document.createElement("button");
+      del.innerHTML = '<i class="fas fa-trash-can"></i>';
+      del.addEventListener("click", () => {
+        delete customPhones[name];
+        delete phonesData[name];
+        persistCustomPhones();
+        populatePhoneList();
+        renderCustomPhonesList();
+      });
+      row.append(thumb, label, del);
+      customList.appendChild(row);
+    });
+  }
+
+  function processImageFile(file, callback) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const maxSide = 560;
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        callback(canvas.toDataURL("image/png"));
+      };
+      img.onerror = () => callback(reader.result);
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function saveCustomPhoneEntry() {
+    const name = customNameInput ? customNameInput.value.trim() : "";
+    const file = customFileInput && customFileInput.files ? customFileInput.files[0] : null;
+    if (!name || !file) {
+      alert(getLocaleText("add_phone_error"));
+      return;
+    }
+    processImageFile(file, dataUrl => {
+      const entry = {
+        image: dataUrl,
+        stabilizationPoint: { x: "37.5%", y: "17.5%" },
+        specs: {
+          processor: (customCpuInput && customCpuInput.value.trim()) || "Custom",
+          camera: (customCamInput && customCamInput.value.trim()) || "Custom"
+        }
+      };
+      customPhones[name] = entry;
+      phonesData[name] = entry;
+      if (!persistCustomPhones()) {
+        delete customPhones[name];
+        delete phonesData[name];
+        return;
+      }
+      populatePhoneList();
+      if (phoneSelect) phoneSelect.value = name;
+      updatePhoneSelection();
+      renderCustomPhonesList();
+      if (customNameInput) customNameInput.value = "";
+      if (customCpuInput) customCpuInput.value = "";
+      if (customCamInput) customCamInput.value = "";
+      if (customFileInput) customFileInput.value = "";
+      if (fileDropText) fileDropText.textContent = getLocaleText("add_phone_upload");
+      toggleElement(addPhoneModal, false);
+      alert(getLocaleText("add_phone_saved_text"));
+    });
   }
 
   function initApplication() {
@@ -248,24 +378,43 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     initLanguage();
-    
+
     if (stabilizationToggle) stabilizationToggle.checked = true;
-    
+
+    loadCustomPhones();
     loadSavedSettings();
     populatePhoneList();
     updatePhoneSelection();
+    renderCustomPhonesList();
 
-    // Привязка UI кнопок
     if (menuBtn) menuBtn.addEventListener("click", () => toggleElement(mainMenuModal, true));
     if (autoSpinBtn) autoSpinBtn.addEventListener("click", toggleAutoSpin);
-    
+
+    if (addPhoneBtn) {
+      addPhoneBtn.addEventListener("click", () => {
+        toggleElement(mainMenuModal, false);
+        toggleElement(addPhoneModal, true);
+      });
+    }
+
+    if (customFileInput) {
+      customFileInput.addEventListener("change", () => {
+        const file = customFileInput.files && customFileInput.files[0];
+        if (fileDropText) {
+          fileDropText.textContent = file ? (file.name.length > 26 ? file.name.slice(0, 24) + "..." : file.name) : getLocaleText("add_phone_upload");
+        }
+      });
+    }
+
+    if (saveCustomBtn) saveCustomBtn.addEventListener("click", saveCustomPhoneEntry);
+
     if (photoModeBtn) {
       photoModeBtn.addEventListener("click", () => {
         toggleElement(photoModal, true);
         toggleElement(mainMenuModal, false);
       });
     }
-    
+
     if (settingsBtn) {
       settingsBtn.addEventListener("click", () => {
         toggleElement(mainMenuModal, false);
@@ -291,40 +440,33 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.addEventListener("click", e => toggleElement(e.target.closest(".modal-overlay"), false));
     });
 
-    // Обработка касаний и кликов (и встроенного Дебага)
     if (wrapperBg) {
       wrapperBg.addEventListener("mousedown", handleDragStart);
       wrapperBg.addEventListener("touchstart", handleDragStart, { passive: false });
-      
-      // Логика Дебага с useCapture=true (перехват клика раньше всего)
+
       wrapperBg.addEventListener("click", e => {
         if (!isDebugMode) return;
         e.stopPropagation();
-        
         const rect = phoneImg.getBoundingClientRect();
-        if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
-            return;
-        }
-        
+        if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
         const xPos = e.clientX - rect.left;
         const yPos = e.clientY - rect.top;
         const xPerc = (xPos / rect.width * 100).toFixed(2);
         const yPerc = (yPos / rect.height * 100).toFixed(2);
         const model = phoneSelect.value;
-        
         phonesData[model].stabilizationPoint = { x: `${xPerc}%`, y: `${yPerc}%` };
+        if (customPhones[model]) {
+          customPhones[model].stabilizationPoint = phonesData[model].stabilizationPoint;
+          persistCustomPhones();
+        }
         updatePhoneSelection();
-        
-        const imgFileName = phonesData[model].image.split('/').pop();
+        const imgFileName = phonesData[model].image.startsWith("data:") ? "CUSTOM" : phonesData[model].image.split("/").pop();
         const proc = phonesData[model].specs ? phonesData[model].specs.processor : "Unknown";
         const cam = phonesData[model].specs ? phonesData[model].specs.camera : "Unknown";
-        
         const codeOutput = `'${model}': {\n    image: 'phones/${imgFileName}',\n    stabilizationPoint: { x: '${xPerc}%', y: '${yPerc}%' },\n    specs: { processor: '${proc}', camera: '${cam}' }\n},`;
-        
-        console.log("Скопируйте этот код и обновите объект 'phonesData' в app.js:\n\n", codeOutput);
-        alert(`Точка для "${model}" установлена: X=${xPerc}%, Y=${yPerc}%\nКод выведен в консоль (F12).`);
-        
-        window.off(); // Автоматически выключаем режим после клика
+        console.log("Copy this code and update 'phonesData' in app.js:\n\n", codeOutput);
+        alert(`Point for "${model}" set: X=${xPerc}%, Y=${yPerc}%\nCode printed to console (F12).`);
+        window.off();
       }, true);
     }
 
@@ -397,7 +539,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (genPhotoBtn) genPhotoBtn.addEventListener("click", buildPhotoCard);
     if (photoExitBtn) photoExitBtn.addEventListener("click", closePhotoCard);
-    
+
     if (propSettingsToggle) propSettingsToggle.addEventListener("click", () => propSettingsPanel.classList.toggle("hidden"));
     if (propBtn) propBtn.addEventListener("click", triggerPropeller);
 
@@ -437,6 +579,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     });
+    renderCustomPhonesList();
   }
 
   function initLanguage() {
@@ -446,7 +589,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (languageModal) {
       languageModal.classList.remove("hidden");
     }
-    
     document.querySelectorAll(".lang-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         const selected = btn.dataset.lang;
@@ -463,7 +605,7 @@ document.addEventListener("DOMContentLoaded", () => {
       particlesObj = null;
     }
     if (activeFx === "none" || (boostToggle && boostToggle.checked)) return;
-    
+
     let particleConfig = {};
     const isLight = lightThemeToggle && lightThemeToggle.checked;
     const pColor = isLight ? "#000000" : "#ffffff";
@@ -498,7 +640,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const keys = Object.keys(phonesData);
       const imagesArr = keys.map(k => ({ src: phonesData[k].image, width: 200, height: 400 }));
       let shapeCfg = { type: "image", options: { image: imagesArr } };
-      
+
       if (activeFx === "mix") {
         shapeCfg = {
           type: ["text", "image"],
@@ -508,7 +650,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         };
       }
-      
+
       particleConfig = {
         fpsLimit: 60,
         particles: {
@@ -522,7 +664,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       };
     }
-    
+
     particlesObj = await tsParticles.load("tsparticles", particleConfig);
   }
 
@@ -533,7 +675,7 @@ document.addEventListener("DOMContentLoaded", () => {
     names.forEach(name => {
       const opt = document.createElement("option");
       opt.value = name;
-      opt.textContent = name;
+      opt.textContent = customPhones[name] ? "★ " + name : name;
       phoneSelect.appendChild(opt);
     });
   }
@@ -542,16 +684,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!phoneSelect || !phoneImg) return;
     const selName = phoneSelect.value;
     if (!phonesData[selName]) return;
-    
+
     const data = phonesData[selName];
     phoneImg.src = data.image;
-    
+
     if (stabilizationToggle && stabilizationToggle.checked) {
       phoneImg.style.transformOrigin = `${data.stabilizationPoint.x} ${data.stabilizationPoint.y}`;
     } else {
       phoneImg.style.transformOrigin = "50% 50%";
     }
-    
+
     if (data.specs && phoneInfoCont) {
       if (cpuInfo) cpuInfo.textContent = data.specs.processor;
       if (camInfo) camInfo.textContent = data.specs.camera;
@@ -566,15 +708,15 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleElement(mainMenuModal, false);
     autoSpinMode = false;
     if (autoSpinBtn) autoSpinBtn.classList.remove("active");
-    
+
     const timeSec = parseInt(propTimeInput ? propTimeInput.value : 5) || 5;
     const pwr = parseInt(propPowerInput ? propPowerInput.value : 25) || 25;
     const animDur = Math.max(0.01, 1 - pwr * 0.019);
-    
+
     isPropellerActive = true;
     phoneImg.classList.add("propeller-active");
     phoneImg.style.animationDuration = animDur + "s";
-    
+
     if (propellerTimeoutId) clearTimeout(propellerTimeoutId);
     propellerTimeoutId = setTimeout(() => {
       isPropellerActive = false;
@@ -589,12 +731,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const nick = photoNickInput.value || "USER";
     const phone = phoneSelect.value;
     const data = phonesData[phone];
-    
+
     pcNick.textContent = nick;
     pcPhone.textContent = phone;
     pcCpu.textContent = data.specs.processor || "Unknown";
     pcCam.textContent = data.specs.camera || "Unknown";
-    
+
     toggleElement(photoModal, false);
     document.querySelector(".app-header").style.display = "none";
     document.getElementById("donation-bar").style.display = "none";
@@ -605,50 +747,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function closePhotoCard() {
     photoCardOverlay.classList.add("hidden");
-    document.querySelector(".app-header").style.display = "flex";
-    document.getElementById("donation-bar").style.display = "block";
-    if (viewfinderToggle.checked) {
-      document.getElementById("camera-viewfinder").style.display = "block";
+    document.querySelector(".app-header").style.display = "";
+    document.getElementById("donation-bar").style.display = "";
+    if (viewfinderToggle && viewfinderToggle.checked) {
+      document.getElementById("camera-viewfinder").style.display = "";
     }
-    phoneInfoCont.style.display = "flex";
+    phoneInfoCont.style.display = "";
   }
 
   function renderEngine() {
     const now = performance.now();
     const dt = now - lastFrameTime;
-    
+
     if (currentFpsLimit && currentFpsLimit < 120 && dt < 1000 / currentFpsLimit) {
       requestAnimationFrame(renderEngine);
       return;
     }
     lastFrameTime = now;
     frameCount++;
-    
+
     if (now - lastFpsTime >= 1000) {
       if (fpsCounter) fpsCounter.innerText = frameCount + " FPS";
       frameCount = 0;
       lastFpsTime = now;
     }
-    
+
     if (!isPropellerActive) {
       if (autoSpinMode && !isDragging) {
         targetRotation += 2;
       }
-      
+
       if (isDragging || Math.abs(targetRotation - currentRotation) > 0.01 || autoSpinMode) {
         currentRotation += (targetRotation - currentRotation) * 0.15;
       }
-      
+
       let transformStr = `perspective(1000px) rotateZ(${currentRotation}deg) scaleX(${stretchScale})`;
-      
+
       if (shadowsToggle && shadowsToggle.checked && boostToggle && !boostToggle.checked) {
         const rx = mouseYPercent * 12;
         const ry = mouseXPercent * -12;
         transformStr += ` rotateX(${rx}deg) rotateY(${ry}deg)`;
       }
-      
+
       if (phoneImg) phoneImg.style.transform = transformStr;
-      
+
       const vFinder = document.getElementById("camera-viewfinder");
       const vHorizon = document.getElementById("viewfinder-horizon");
       if (vFinder && !vFinder.classList.contains("hidden") && vHorizon) {
@@ -666,49 +808,49 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target.closest(".modal-overlay") || e.target.closest(".app-header") || isPropellerActive || isDebugMode) return;
     e.preventDefault();
     isDragging = true;
-    
+
     if (autoSpinMode) {
       autoSpinMode = false;
       if (autoSpinBtn) autoSpinBtn.classList.remove("active");
     }
-    
+
     const clientX = e.type.includes("touch") ? e.touches[0].clientX : e.clientX;
     const clientY = e.type.includes("touch") ? e.touches[0].clientY : e.clientY;
     dragStartX = clientX;
     dragStartY = clientY;
-    
+
     if (joystickEl) {
       joystickEl.style.left = clientX + "px";
       joystickEl.style.top = clientY + "px";
       joystickEl.classList.remove("hidden");
     }
-    
+
     lastAngle = Math.atan2(clientY - dragStartY, clientX - dragStartX) * (180 / Math.PI);
-    
+
     const moveHandler = ev => {
       if (!isDragging) return;
       const x = ev.type.includes("touch") ? ev.touches[0].clientX : ev.clientX;
       const y = ev.type.includes("touch") ? ev.touches[0].clientY : ev.clientY;
       const angle = Math.atan2(y - dragStartY, x - dragStartX) * (180 / Math.PI);
-      
+
       let diff = angle - lastAngle;
       if (diff > 180) diff -= 360;
       if (diff < -180) diff += 360;
-      
+
       lastAngle = angle;
       targetRotation += diff;
       checkFireEffect();
-      
+
       const dx = x - dragStartX;
       const dy = y - dragStartY;
       const dist = Math.min(35, Math.hypot(dx, dy));
       const angRad = Math.atan2(dy, dx);
-      
+
       if (joystickHandle) {
         joystickHandle.style.transform = `translate(-50%, -50%) translate(${dist * Math.cos(angRad)}px, ${dist * Math.sin(angRad)}px)`;
       }
     };
-    
+
     const endHandler = () => {
       isDragging = false;
       if (joystickEl) joystickEl.classList.add("hidden");
@@ -717,7 +859,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.removeEventListener("touchmove", moveHandler);
       document.removeEventListener("touchend", endHandler);
     };
-    
+
     document.addEventListener("mousemove", moveHandler);
     document.addEventListener("mouseup", endHandler);
     document.addEventListener("touchmove", moveHandler, { passive: false });
@@ -728,7 +870,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!whiteFireToggle || !whiteFireToggle.checked || (boostToggle && boostToggle.checked)) return;
     fireIntensity += 5;
     if (fireIntensity > 100 && fireEffectEl) fireEffectEl.classList.add("active");
-    
+
     clearTimeout(fireTimeout);
     fireTimeout = setTimeout(() => {
       fireIntensity = 0;
@@ -751,10 +893,10 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       applyFxParticles();
     }
-    
+
     updatePhoneSelection();
     applyBackgroundStyle();
-    
+
     const vFinder = document.getElementById("camera-viewfinder");
     if (viewfinderToggle && vFinder) {
       if (viewfinderToggle.checked) vFinder.classList.remove("hidden");
