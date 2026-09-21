@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
       settings_fps: "FPS (Производительность)", photo_mode_title: "Фото Режим",
       photo_mode_desc: "Создать красивый скриншот", photo_nick_label: "Твой Никнейм", photo_generate: "Создать Вид",
       add_phone_button: "Добавить свой телефон", add_phone_title: "Добавить свой телефон", add_phone_name: "Название модели",
-      add_phone_image: "Изображение телефона", add_phone_upload: "Нажмите, чтобы выбрать PNG",
+      add_phone_image: "Изображение телефона", add_phone_upload: "Выберите PNG, JPG или WEBP",
       add_phone_cpu: "Процессор", add_phone_cam: "Камера", add_phone_save: "Сохранить телефон",
       add_phone_error: "Введите название и выберите изображение", custom_list_title: "Мои устройства",
       add_phone_saved_text: "Телефон добавлен! Для точной настройки точки стабилизации введите camera() в консоли (F12) и кликните по камере на картинке."
@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
       settings_fps: "FPS (Performance)", photo_mode_title: "Photo Mode",
       photo_mode_desc: "Create a beautiful screenshot", photo_nick_label: "Your Nickname", photo_generate: "Generate View",
       add_phone_button: "Add Your Phone", add_phone_title: "Add Your Phone", add_phone_name: "Model Name",
-      add_phone_image: "Phone Image", add_phone_upload: "Tap to choose a PNG",
+      add_phone_image: "Phone Image", add_phone_upload: "Choose PNG, JPG or WEBP",
       add_phone_cpu: "Processor", add_phone_cam: "Camera", add_phone_save: "Save Phone",
       add_phone_error: "Enter a name and select an image", custom_list_title: "My Devices",
       add_phone_saved_text: "Phone added! For precise stabilization point calibration type camera() in the console (F12) and click the camera on the image."
@@ -251,21 +251,112 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("%c[DEBUG] Type camera() to start calibration, off() to disable.", "color: cyan; font-weight: bold;");
   }
 
+  const MAX_CUSTOM = 10;
+  const MAX_INPUT_BYTES = 8 * 1024 * 1024;
+  const MAX_STORED_CHARS = 380000;
+  const SAFE_DATA_IMG = /^data:image\/png;base64,[A-Za-z0-9+/]+=*$/;
+  const SAFE_BUILTIN_IMG = /^phones\/[\w .+\-]+\.png$/;
+  const EXT_OK = /\.(png|jpe?g|jfif|pjpeg|pjp|webp|gif|bmp|avif)$/i;
+  const MSG = {
+    ru: {
+      limit: "Максимум 10 своих телефонов. Удалите один, чтобы добавить новый.",
+      noName: "Введите название модели.",
+      noFile: "Выберите изображение телефона.",
+      type: "Формат не поддерживается. Разрешены PNG, JPG, JFIF, WEBP, GIF, BMP, AVIF.",
+      size: "Файл больше 8 МБ.",
+      decode: "Не удалось прочитать файл. Он повреждён или это не изображение.",
+      big: "Изображение слишком тяжёлое. Выберите файл поменьше.",
+      storage: "Память браузера заполнена. Удалите один из телефонов.",
+      saved: "Телефон добавлен. Нажмите ◎ в списке, чтобы указать точку камеры.",
+      calib: "Нажмите на камеру телефона.",
+      point: "Точка камеры сохранена."
+    },
+    en: {
+      limit: "You can add up to 10 phones. Delete one to add another.",
+      noName: "Enter a model name.",
+      noFile: "Choose a phone image.",
+      type: "Unsupported format. Allowed: PNG, JPG, JFIF, WEBP, GIF, BMP, AVIF.",
+      size: "File is larger than 8 MB.",
+      decode: "Could not read the file. It is damaged or not an image.",
+      big: "Image is too heavy. Choose a smaller file.",
+      storage: "Browser storage is full. Delete one of your phones.",
+      saved: "Phone added. Tap ◎ in the list to set the camera point.",
+      calib: "Tap the camera on the phone.",
+      point: "Camera point saved."
+    }
+  };
+
+  function tr(key) {
+    const lang = MSG[document.documentElement.lang] ? document.documentElement.lang : "ru";
+    return MSG[lang][key] || key;
+  }
+
+  function toast(msg, kind) {
+    document.querySelectorAll(".toast").forEach(n => n.remove());
+    const el = document.createElement("div");
+    el.className = "toast " + (kind || "");
+    el.setAttribute("role", "status");
+    el.textContent = msg;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add("show"));
+    setTimeout(() => {
+      el.classList.remove("show");
+      setTimeout(() => el.remove(), 300);
+    }, 3400);
+  }
+
+  function isSafeImage(src) {
+    return typeof src === "string" && (SAFE_BUILTIN_IMG.test(src) || (src.length < 600000 && SAFE_DATA_IMG.test(src)));
+  }
+
+  function cleanText(value, max) {
+    return String(value == null ? "" : value)
+      .replace(/[\u0000-\u001f\u007f<>"'`&\\]/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, max);
+  }
+
+  function pct(value, fallback) {
+    const n = parseFloat(value);
+    return (isFinite(n) ? Math.min(100, Math.max(0, n)) : fallback) + "%";
+  }
+
+  function newId() {
+    return "custom_" + Array.from(crypto.getRandomValues(new Uint8Array(6)), b => (b % 36).toString(36)).join("");
+  }
+
+  function sniffImage(b) {
+    const s = (i, n) => String.fromCharCode.apply(null, Array.from(b.slice(i, i + n)));
+    if (b[0] === 0x89 && s(1, 3) === "PNG") return "png";
+    if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return "jpeg";
+    if (s(0, 4) === "GIF8") return "gif";
+    if (s(0, 4) === "RIFF" && s(8, 4) === "WEBP") return "webp";
+    if (s(0, 2) === "BM") return "bmp";
+    if (s(4, 8) === "ftypavif") return "avif";
+    return null;
+  }
+
   function loadCustomPhones() {
     customPhones = {};
-    try {
-      const stored = JSON.parse(localStorage.getItem("jxCustomPhones"));
-      if (stored && typeof stored === "object") {
-        Object.keys(stored).forEach(key => {
-          if (stored[key] && stored[key].image) {
-            customPhones[key] = stored[key];
-            phonesData[key] = stored[key];
-          }
-        });
-      }
-    } catch (err) {
-      customPhones = {};
-    }
+    let stored = null;
+    try { stored = JSON.parse(localStorage.getItem("jxCustomPhones")); } catch (err) { stored = null; }
+    if (!stored || typeof stored !== "object") return;
+    Object.keys(stored).slice(0, MAX_CUSTOM).forEach(key => {
+      const p = stored[key];
+      if (!p || !isSafeImage(p.image)) return;
+      const id = /^custom_[a-z0-9]{6}$/.test(key) ? key : newId();
+      const pt = p.stabilizationPoint || {};
+      const specs = p.specs || {};
+      const entry = {
+        name: cleanText(p.name || key, 32) || "Phone",
+        image: p.image,
+        stabilizationPoint: { x: pct(pt.x, 37.5), y: pct(pt.y, 17.5) },
+        specs: { processor: cleanText(specs.processor, 32) || "Custom", camera: cleanText(specs.camera, 32) || "Custom" }
+      };
+      customPhones[id] = entry;
+      phonesData[id] = entry;
+    });
   }
 
   function persistCustomPhones() {
@@ -273,96 +364,141 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("jxCustomPhones", JSON.stringify(customPhones));
       return true;
     } catch (err) {
-      alert("Storage is full. Delete some custom phones.");
+      toast(tr("storage"), "err");
       return false;
     }
   }
 
+  function makeRowButton(iconClass, title, cls, onClick) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.title = title;
+    btn.setAttribute("aria-label", title);
+    if (cls) btn.className = cls;
+    const icon = document.createElement("i");
+    icon.className = iconClass;
+    btn.appendChild(icon);
+    btn.addEventListener("click", onClick);
+    return btn;
+  }
+
   function renderCustomPhonesList() {
     if (!customList) return;
-    customList.innerHTML = "";
-    const keys = Object.keys(customPhones);
-    if (!keys.length) return;
+    customList.replaceChildren();
+    const ids = Object.keys(customPhones);
+    const counter = document.getElementById("custom-count");
+    if (counter) counter.textContent = ids.length + " / " + MAX_CUSTOM;
+    if (saveCustomBtn) saveCustomBtn.disabled = ids.length >= MAX_CUSTOM;
+    if (!ids.length) return;
+
     const title = document.createElement("p");
     title.className = "custom-list-title";
     title.textContent = getLocaleText("custom_list_title");
     customList.appendChild(title);
-    keys.forEach(name => {
+
+    ids.forEach(id => {
       const row = document.createElement("div");
       row.className = "custom-phone-row";
       const thumb = document.createElement("img");
-      thumb.src = customPhones[name].image;
+      thumb.alt = "";
       thumb.draggable = false;
+      if (isSafeImage(customPhones[id].image)) thumb.src = customPhones[id].image;
       const label = document.createElement("span");
-      label.textContent = name;
-      const del = document.createElement("button");
-      del.innerHTML = '<i class="fas fa-trash-can"></i>';
-      del.addEventListener("click", () => {
-        delete customPhones[name];
-        delete phonesData[name];
+      label.textContent = customPhones[id].name;
+      const cal = makeRowButton("fas fa-crosshairs", "Camera point", "", () => {
+        toggleElement(addPhoneModal, false);
+        phoneSelect.value = id;
+        updatePhoneSelection();
+        window.camera();
+        toast(tr("calib"), "ok");
+      });
+      const del = makeRowButton("fas fa-trash-can", "Delete", "danger", () => {
+        delete customPhones[id];
+        delete phonesData[id];
         persistCustomPhones();
         populatePhoneList();
+        updatePhoneSelection();
         renderCustomPhonesList();
       });
-      row.append(thumb, label, del);
+      row.append(thumb, label, cal, del);
       customList.appendChild(row);
     });
   }
 
-  function processImageFile(file, callback) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const maxSide = 560;
-        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+  async function processImageFile(file) {
+    if (file.size > MAX_INPUT_BYTES) throw new Error("size");
+    if (!EXT_OK.test(file.name)) throw new Error("type");
+    const head = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+    if (!sniffImage(head)) throw new Error("type");
+
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await new Promise((resolve, reject) => {
+        const i = new Image();
+        i.onload = () => resolve(i);
+        i.onerror = () => reject(new Error("decode"));
+        i.src = url;
+      });
+      if (!img.width || !img.height || img.width * img.height > 40000000) throw new Error("decode");
+      let side = 640;
+      for (let n = 0; n < 6; n++) {
+        const scale = Math.min(1, side / Math.max(img.width, img.height));
         const canvas = document.createElement("canvas");
         canvas.width = Math.max(1, Math.round(img.width * scale));
         canvas.height = Math.max(1, Math.round(img.height * scale));
         canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-        callback(canvas.toDataURL("image/png"));
-      };
-      img.onerror = () => callback(reader.result);
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
+        const out = canvas.toDataURL("image/png");
+        if (out.length <= MAX_STORED_CHARS) return out;
+        side = Math.round(side * 0.8);
+      }
+      throw new Error("big");
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   }
 
-  function saveCustomPhoneEntry() {
-    const name = customNameInput ? customNameInput.value.trim() : "";
-    const file = customFileInput && customFileInput.files ? customFileInput.files[0] : null;
-    if (!name || !file) {
-      alert(getLocaleText("add_phone_error"));
-      return;
-    }
-    processImageFile(file, dataUrl => {
+  async function saveCustomPhoneEntry() {
+    if (Object.keys(customPhones).length >= MAX_CUSTOM) return toast(tr("limit"), "err");
+    const name = cleanText(customNameInput && customNameInput.value, 32);
+    const file = customFileInput && customFileInput.files && customFileInput.files[0];
+    if (!name) return toast(tr("noName"), "err");
+    if (!file) return toast(tr("noFile"), "err");
+
+    saveCustomBtn.disabled = true;
+    try {
+      const image = await processImageFile(file);
+      const id = newId();
       const entry = {
-        image: dataUrl,
+        name,
+        image,
         stabilizationPoint: { x: "37.5%", y: "17.5%" },
         specs: {
-          processor: (customCpuInput && customCpuInput.value.trim()) || "Custom",
-          camera: (customCamInput && customCamInput.value.trim()) || "Custom"
+          processor: cleanText(customCpuInput && customCpuInput.value, 32) || "Custom",
+          camera: cleanText(customCamInput && customCamInput.value, 32) || "Custom"
         }
       };
-      customPhones[name] = entry;
-      phonesData[name] = entry;
+      customPhones[id] = entry;
+      phonesData[id] = entry;
       if (!persistCustomPhones()) {
-        delete customPhones[name];
-        delete phonesData[name];
+        delete customPhones[id];
+        delete phonesData[id];
         return;
       }
       populatePhoneList();
-      if (phoneSelect) phoneSelect.value = name;
+      phoneSelect.value = id;
       updatePhoneSelection();
-      renderCustomPhonesList();
       if (customNameInput) customNameInput.value = "";
       if (customCpuInput) customCpuInput.value = "";
       if (customCamInput) customCamInput.value = "";
       if (customFileInput) customFileInput.value = "";
       if (fileDropText) fileDropText.textContent = getLocaleText("add_phone_upload");
       toggleElement(addPhoneModal, false);
-      alert(getLocaleText("add_phone_saved_text"));
-    });
+      toast(tr("saved"), "ok");
+    } catch (err) {
+      toast(tr(MSG.ru[err.message] ? err.message : "decode"), "err");
+    } finally {
+      renderCustomPhonesList();
+    }
   }
 
   function initApplication() {
@@ -407,6 +543,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (saveCustomBtn) saveCustomBtn.addEventListener("click", saveCustomPhoneEntry);
+
+    const headerAddBtn = document.getElementById("header-add-btn");
+    if (headerAddBtn) {
+      headerAddBtn.addEventListener("click", () => {
+        toggleElement(mainMenuModal, false);
+        toggleElement(addPhoneModal, true);
+      });
+    }
+
+    document.addEventListener("keydown", e => {
+      if (e.key !== "Escape") return;
+      document.querySelectorAll(".modal-overlay:not(.hidden)").forEach(m => { if (m !== languageModal) m.classList.add("hidden"); });
+    });
 
     if (photoModeBtn) {
       photoModeBtn.addEventListener("click", () => {
@@ -465,7 +614,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const cam = phonesData[model].specs ? phonesData[model].specs.camera : "Unknown";
         const codeOutput = `'${model}': {\n    image: 'phones/${imgFileName}',\n    stabilizationPoint: { x: '${xPerc}%', y: '${yPerc}%' },\n    specs: { processor: '${proc}', camera: '${cam}' }\n},`;
         console.log("Copy this code and update 'phonesData' in app.js:\n\n", codeOutput);
-        alert(`Point for "${model}" set: X=${xPerc}%, Y=${yPerc}%\nCode printed to console (F12).`);
+        toast(tr("point"), "ok");
         window.off();
       }, true);
     }
@@ -529,6 +678,7 @@ document.addEventListener("DOMContentLoaded", () => {
       musicTrackBtns.forEach(btn => {
         btn.addEventListener("click", () => {
           if (bgMusic) {
+            if (!/^[\w\-]+\.mp3$/.test(btn.dataset.src || "")) return;
             bgMusic.src = btn.dataset.src;
             bgMusic.play().catch(console.error);
           }
@@ -561,6 +711,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function switchLanguage(langCode) {
+    if (!textLocales[langCode]) langCode = "ru";
     document.documentElement.lang = langCode;
     document.querySelectorAll("[data-translate-key]").forEach(el => {
       const key = el.dataset.translateKey;
@@ -637,7 +788,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       };
     } else if (activeFx === "phones" || activeFx === "mix") {
-      const keys = Object.keys(phonesData);
+      const keys = Object.keys(phonesData).filter(k => isSafeImage(phonesData[k].image));
       const imagesArr = keys.map(k => ({ src: phonesData[k].image, width: 200, height: 400 }));
       let shapeCfg = { type: "image", options: { image: imagesArr } };
 
@@ -670,12 +821,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function populatePhoneList() {
     if (!phoneSelect) return;
-    const names = Object.keys(phonesData).sort();
+    const names = Object.keys(phonesData).sort((a, b) => (!!customPhones[b] - !!customPhones[a]) || a.localeCompare(b));
     phoneSelect.innerHTML = "";
     names.forEach(name => {
       const opt = document.createElement("option");
       opt.value = name;
-      opt.textContent = customPhones[name] ? "★ " + name : name;
+      opt.textContent = customPhones[name] ? "★ " + customPhones[name].name : name;
       phoneSelect.appendChild(opt);
     });
   }
@@ -686,7 +837,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!phonesData[selName]) return;
 
     const data = phonesData[selName];
-    phoneImg.src = data.image;
+    phoneImg.src = isSafeImage(data.image) ? data.image : "";
 
     if (stabilizationToggle && stabilizationToggle.checked) {
       phoneImg.style.transformOrigin = `${data.stabilizationPoint.x} ${data.stabilizationPoint.y}`;
@@ -728,12 +879,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function buildPhotoCard() {
-    const nick = photoNickInput.value || "USER";
+    const nick = cleanText(photoNickInput.value, 24) || "USER";
     const phone = phoneSelect.value;
     const data = phonesData[phone];
 
     pcNick.textContent = nick;
-    pcPhone.textContent = phone;
+    pcPhone.textContent = data.name || phone;
     pcCpu.textContent = data.specs.processor || "Unknown";
     pcCam.textContent = data.specs.camera || "Unknown";
 
@@ -881,7 +1032,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function applyBackgroundStyle() {
     if (!lightThemeToggle || !bgSelect) return;
     document.body.className = lightThemeToggle.checked ? "light-theme" : "dark-theme";
-    document.body.classList.add(bgSelect.value);
+    if (/^bg-[a-z]+$/.test(bgSelect.value)) document.body.classList.add(bgSelect.value);
   }
 
   function applySettingsLogic() {
@@ -922,10 +1073,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function loadSavedSettings() {
-    const stored = JSON.parse(localStorage.getItem("jxStabSettings_V3"));
+    let stored = null;
+    try { stored = JSON.parse(localStorage.getItem("jxStabSettings_V3")); } catch (e) { stored = null; }
+    if (stored && typeof stored !== "object") stored = null;
     if (stored) {
       if (lightThemeToggle) lightThemeToggle.checked = stored.lightTheme || false;
-      activeFx = stored.fxMode || "none";
+      activeFx = ["none", "snow", "text", "phones", "mix"].includes(stored.fxMode) ? stored.fxMode : "none";
       if (whiteFireToggle) whiteFireToggle.checked = stored.fire;
       if (shadowsToggle) shadowsToggle.checked = stored.shadows;
       if (stabilizationToggle) stabilizationToggle.checked = stored.stabilization;
@@ -933,12 +1086,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (viewfinderToggle) viewfinderToggle.checked = stored.viewfinder;
       if (bgSelect) bgSelect.value = stored.bg || "bg-default";
       if (stored.stretch) {
-        stretchScale = stored.stretch;
-        if (stretchInput) stretchInput.value = stored.stretch;
+        stretchScale = Math.min(2, Math.max(0.5, Number(stored.stretch) || 1));
+        if (stretchInput) stretchInput.value = stretchScale;
       }
       if (stored.fps) {
-        currentFpsLimit = stored.fps;
-        if (fpsInput) fpsInput.value = stored.fps;
+        currentFpsLimit = [30, 60, 120].includes(Number(stored.fps)) ? Number(stored.fps) : 60;
+        if (fpsInput) fpsInput.value = currentFpsLimit;
       }
       if (fxButtons) {
         fxButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.fx === activeFx));
