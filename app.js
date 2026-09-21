@@ -267,7 +267,9 @@ document.addEventListener("DOMContentLoaded", () => {
       decode: "Не удалось прочитать файл. Он повреждён или это не изображение.",
       big: "Изображение слишком тяжёлое. Выберите файл поменьше.",
       storage: "Память браузера заполнена. Удалите один из телефонов.",
-      saved: "Телефон добавлен. Нажмите ◎ в списке, чтобы указать точку камеры.",
+      saved: "Телефон добавлен. Точку камеры можно уточнить кнопкой ◎ в списке.",
+      noPoint: "Отметьте на картинке, где находится камера.",
+      pickHint: "Нажмите на камеру телефона — вокруг этой точки он будет стабилизироваться.",
       calib: "Нажмите на камеру телефона.",
       point: "Точка камеры сохранена."
     },
@@ -280,7 +282,9 @@ document.addEventListener("DOMContentLoaded", () => {
       decode: "Could not read the file. It is damaged or not an image.",
       big: "Image is too heavy. Choose a smaller file.",
       storage: "Browser storage is full. Delete one of your phones.",
-      saved: "Phone added. Tap ◎ in the list to set the camera point.",
+      saved: "Phone added. You can fine-tune the camera point with ◎ in the list.",
+      noPoint: "Mark where the camera is on the image.",
+      pickHint: "Tap the phone's camera — it stabilizes around this point.",
       calib: "Tap the camera on the phone.",
       point: "Camera point saved."
     }
@@ -457,48 +461,93 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  let pendingImage = null;
+  let pendingPoint = null;
+  let pickToken = 0;
+
+  function resetPicker() {
+    pickToken++;
+    pendingImage = null;
+    pendingPoint = null;
+    const box = document.getElementById("point-picker");
+    const marker = document.getElementById("point-marker");
+    const img = document.getElementById("point-preview");
+    if (box) box.classList.add("hidden");
+    if (marker) marker.classList.add("hidden");
+    if (img) img.removeAttribute("src");
+  }
+
+  async function onPhoneFileChosen() {
+    const file = customFileInput.files && customFileInput.files[0];
+    resetPicker();
+    if (fileDropText) {
+      fileDropText.textContent = file ? (file.name.length > 26 ? file.name.slice(0, 24) + "..." : file.name) : getLocaleText("add_phone_upload");
+    }
+    if (!file) return;
+    const token = pickToken;
+    try {
+      const image = await processImageFile(file);
+      if (token !== pickToken) return;
+      pendingImage = image;
+      document.getElementById("point-preview").src = image;
+      document.getElementById("point-hint").textContent = tr("pickHint");
+      document.getElementById("point-picker").classList.remove("hidden");
+    } catch (err) {
+      toast(tr(MSG.ru[err.message] ? err.message : "decode"), "err");
+      customFileInput.value = "";
+      if (fileDropText) fileDropText.textContent = getLocaleText("add_phone_upload");
+    }
+  }
+
+  function onPointPick(e) {
+    const img = document.getElementById("point-preview");
+    const marker = document.getElementById("point-marker");
+    const r = img.getBoundingClientRect();
+    if (!pendingImage || !r.width || !r.height) return;
+    const x = Math.min(100, Math.max(0, (e.clientX - r.left) / r.width * 100));
+    const y = Math.min(100, Math.max(0, (e.clientY - r.top) / r.height * 100));
+    pendingPoint = { x: x.toFixed(2) + "%", y: y.toFixed(2) + "%" };
+    marker.style.left = x + "%";
+    marker.style.top = y + "%";
+    marker.classList.remove("hidden");
+  }
+
   async function saveCustomPhoneEntry() {
     if (Object.keys(customPhones).length >= MAX_CUSTOM) return toast(tr("limit"), "err");
     const name = cleanText(customNameInput && customNameInput.value, 32);
-    const file = customFileInput && customFileInput.files && customFileInput.files[0];
     if (!name) return toast(tr("noName"), "err");
-    if (!file) return toast(tr("noFile"), "err");
+    if (!pendingImage) return toast(tr("noFile"), "err");
+    if (!pendingPoint) return toast(tr("noPoint"), "err");
 
-    saveCustomBtn.disabled = true;
-    try {
-      const image = await processImageFile(file);
-      const id = newId();
-      const entry = {
-        name,
-        image,
-        stabilizationPoint: { x: "37.5%", y: "17.5%" },
-        specs: {
-          processor: cleanText(customCpuInput && customCpuInput.value, 32) || "Custom",
-          camera: cleanText(customCamInput && customCamInput.value, 32) || "Custom"
-        }
-      };
-      customPhones[id] = entry;
-      phonesData[id] = entry;
-      if (!persistCustomPhones()) {
-        delete customPhones[id];
-        delete phonesData[id];
-        return;
+    const id = newId();
+    const entry = {
+      name,
+      image: pendingImage,
+      stabilizationPoint: { x: pendingPoint.x, y: pendingPoint.y },
+      specs: {
+        processor: cleanText(customCpuInput && customCpuInput.value, 32) || "Custom",
+        camera: cleanText(customCamInput && customCamInput.value, 32) || "Custom"
       }
-      populatePhoneList();
-      phoneSelect.value = id;
-      updatePhoneSelection();
-      if (customNameInput) customNameInput.value = "";
-      if (customCpuInput) customCpuInput.value = "";
-      if (customCamInput) customCamInput.value = "";
-      if (customFileInput) customFileInput.value = "";
-      if (fileDropText) fileDropText.textContent = getLocaleText("add_phone_upload");
-      toggleElement(addPhoneModal, false);
-      toast(tr("saved"), "ok");
-    } catch (err) {
-      toast(tr(MSG.ru[err.message] ? err.message : "decode"), "err");
-    } finally {
-      renderCustomPhonesList();
+    };
+    customPhones[id] = entry;
+    phonesData[id] = entry;
+    if (!persistCustomPhones()) {
+      delete customPhones[id];
+      delete phonesData[id];
+      return;
     }
+    populatePhoneList();
+    phoneSelect.value = id;
+    updatePhoneSelection();
+    if (customNameInput) customNameInput.value = "";
+    if (customCpuInput) customCpuInput.value = "";
+    if (customCamInput) customCamInput.value = "";
+    if (customFileInput) customFileInput.value = "";
+    if (fileDropText) fileDropText.textContent = getLocaleText("add_phone_upload");
+    resetPicker();
+    renderCustomPhonesList();
+    toggleElement(addPhoneModal, false);
+    toast(tr("saved"), "ok");
   }
 
   function initApplication() {
@@ -533,14 +582,9 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    if (customFileInput) {
-      customFileInput.addEventListener("change", () => {
-        const file = customFileInput.files && customFileInput.files[0];
-        if (fileDropText) {
-          fileDropText.textContent = file ? (file.name.length > 26 ? file.name.slice(0, 24) + "..." : file.name) : getLocaleText("add_phone_upload");
-        }
-      });
-    }
+    if (customFileInput) customFileInput.addEventListener("change", onPhoneFileChosen);
+    const pointStage = document.getElementById("point-stage");
+    if (pointStage) pointStage.addEventListener("click", onPointPick);
 
     if (saveCustomBtn) saveCustomBtn.addEventListener("click", saveCustomPhoneEntry);
 
